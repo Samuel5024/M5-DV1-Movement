@@ -1,16 +1,16 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
+
 
 public class GrabClimb : MonoBehaviour
 {
-    private XRSimpleInteractable interactable;
+    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable interactable;
     private ClimbController climbController;
     private bool isGrabbing;
     private Vector3 handPosition;
 
     private void Start()
     {
-        interactable = GetComponent<XRSimpleInteractable>();
+        interactable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable>();
         climbController = GetComponentInParent<ClimbController>();
         isGrabbing = false;    
     }
@@ -24,7 +24,7 @@ public class GrabClimb : MonoBehaviour
 
     private Vector3 InteractorPosition()
     {
-        List<XRBaseInteractor> interactors = interactable.hoveringInteractors;
+        List<UnityEngine.XR.Interaction.Toolkit.Interactors.XRBaseInteractor> interactors = interactable.hoveringInteractors;
         if(interactors.Count > 0)
             return interactors[0].transform.position;
         else
