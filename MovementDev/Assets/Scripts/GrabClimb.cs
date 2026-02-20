@@ -1,16 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using  UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 
 public class GrabClimb : MonoBehaviour
 {
-    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable interactable;
+    [SerializeField] XRSimpleInteractable interactable;
     private ClimbController climbController;
     private bool isGrabbing;
     private Vector3 handPosition;
 
     private void Start()
     {
-        interactable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable>();
+        interactable = GetComponent<XRSimpleInteractable>();
         climbController = GetComponentInParent<ClimbController>();
         isGrabbing = false;    
     }
@@ -19,15 +22,31 @@ public class GrabClimb : MonoBehaviour
     {
         isGrabbing = true;
         handPosition = InteractorPosition();
-        ClimbController.Grab();
+        climbController.Grab();
     }
 
     private Vector3 InteractorPosition()
     {
-        List<UnityEngine.XR.Interaction.Toolkit.Interactors.XRBaseInteractor> interactors = interactable.hoveringInteractors;
+        List<IXRHoverInteractor> interactors = interactable.interactorsHovering;
         if(interactors.Count > 0)
             return interactors[0].transform.position;
         else
             return handPosition;
+    }
+
+    private void Update()
+    {
+        if(isGrabbing)
+        {
+            Vector3 delta = handPosition - InteractorPosition();
+            climbController.Pull(delta);
+            handPosition = InteractorPosition();
+        }
+    }
+
+    public void Release()
+    {
+        isGrabbing = false;
+        climbController.Release();
     }
 }
