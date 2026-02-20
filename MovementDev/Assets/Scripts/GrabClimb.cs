@@ -6,6 +6,7 @@ using  UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class GrabClimb : MonoBehaviour
 {
+    // interactable holds XRSimpleInteractable component
     [SerializeField] XRSimpleInteractable interactable;
     private ClimbController climbController;
     private bool isGrabbing;
@@ -21,10 +22,12 @@ public class GrabClimb : MonoBehaviour
     public void Grab()
     {
         isGrabbing = true;
+        // register hand posotion
         handPosition = InteractorPosition();
         climbController.Grab();
     }
 
+    // get current hand position with the InteractorPosition function
     private Vector3 InteractorPosition()
     {
         List<IXRHoverInteractor> interactors = interactable.interactorsHovering;
@@ -38,8 +41,12 @@ public class GrabClimb : MonoBehaviour
     {
         if(isGrabbing)
         {
+            // calculate delta distance the hand controller (Interactor)
+            // has moved since previous frame & pass distance to
+            // climbController.Pull
             Vector3 delta = handPosition - InteractorPosition();
             climbController.Pull(delta);
+            // update current hand position
             handPosition = InteractorPosition();
         }
     }
