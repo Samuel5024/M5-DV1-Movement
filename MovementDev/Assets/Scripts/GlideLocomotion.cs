@@ -1,20 +1,43 @@
 using UnityEngine;
-
-public class GlideLocomotion : MonoBehaviour
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion;
+public class GlideLocomotion : LocomotionProvider
 {
     public Transform rigRoot;
     public float velocity = 2f; // meters per second
     public float rotationSpeed = 100f; // degrees per second
     public Transform trackedTransform; // camera or controller, null for thumbstick
+    private bool isMoving;
     private void Start()
     {
         if(rigRoot == null)
+        {
             rigRoot = transform;
+        }
     }
 
     private void Update()
     {
+        if(!isMoving && !CanBeginLocomotion())
+        {
+            return;
+        }
         float forward = Input.GetAxis("XRI_Right_Primary2DAxis_Vertical");
+        float sideways = Input.GetAxis("XRI_Right_Primary2DAxis_Horizontal");
+
+        if(forward == 0f && sideways == 0f)
+        {
+            isMoving = false;
+            EndLocomotion();
+            return;
+        }
+
+        if(!isMoving)
+        {
+            isMoving = true;
+            BeginLocomotion();
+        }
+
         if(forward != 0f)
         {
             Vector3 moveDirection = Vector3.forward;
@@ -27,9 +50,8 @@ public class GlideLocomotion : MonoBehaviour
             rigRoot.Translate(moveDirection);
         }
 
-        if(trackedTransform == null)
-        {
-            float sideways = Input.GetAxis("XRI_Right_Primary2DAxis_Horizontal");
+        if(trackedTransform == null && sideways != 0f)
+        { 
             if(sideways != 0f)
             {
                 float rotation = sideways * rotationSpeed * Time.deltaTime;
